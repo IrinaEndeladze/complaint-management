@@ -1,0 +1,29 @@
+{
+  "sap.app": {
+    "crossNavigation": {
+      "inbounds": {
+        "router.backup-display": {
+          "semanticObject": "router.backup",
+          "action": "display",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    },
+    "id": "complaint-management",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "type": "application",
+    "title": "",
+    "description": "A simple CAP project.",
+    "i18n": "i18n/i18n.properties"
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "complaintmanagement.service"
+  },
+  "_version": "1.49.0"
+}

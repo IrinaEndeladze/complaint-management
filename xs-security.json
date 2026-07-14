@@ -1,0 +1,31 @@
+{
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.SupportAgent",
+      "description": "SupportAgent"
+    },
+    {
+      "name": "$XSAPPNAME.ComplaintManager",
+      "description": "ComplaintManager"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "SupportAgent",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.SupportAgent"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "ComplaintManager",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.ComplaintManager"
+      ],
+      "attribute-references": []
+    }
+  ]
+}

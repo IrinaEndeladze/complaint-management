@@ -1,0 +1,166 @@
+_schema-version: 3.3.0
+ID: complaint-management
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+  deploy_mode: html5-repo
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+modules:
+  - name: complaint-management-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: complaint-management-auth
+      - name: complaint-management-db
+      - name: complaint-management-destination
+
+  - name: complaint-management-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: complaint-management-db
+
+  - name: complaint-management-app-deployer
+    type: com.sap.application.content
+    path: gen
+    build-parameters:
+      build-result: app/
+      requires:
+        - name: complaintmanagementcomplaints
+          artifacts:
+            - complaints.zip
+          target-path: app/
+    requires:
+      - name: complaint-management-auth
+      - name: srv-api
+      - name: complaint-management-html5-repo-host
+        parameters:
+          content-target: true
+          config:
+            HTML5Runtime_enabled: true
+    parameters:
+      config:
+        destinations:
+          - Name: srv-api
+            URL: ~{srv-api/srv-url}
+            Authentication: NoAuthentication
+            Type: HTTP
+            ProxyType: Internet
+            HTML5.ForwardAuthToken: true
+            HTML5.DynamicDestination: true
+
+  - name: complaintmanagementcomplaints
+    type: html5
+    path: app/complaints
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build
+      supported-platforms:
+        []
+
+  - name: complaint-management-destinations
+    type: com.sap.application.content
+    requires:
+      - name: complaint-management-auth
+        parameters:
+          service-key:
+            name: complaint-management-auth-key
+      - name: complaint-management-html5-repo-host
+        parameters:
+          service-key:
+            name: complaint-management-html5-repo-host-key
+      - name: srv-api
+      - name: complaint-management-destination
+        parameters:
+          content-target: true
+    build-parameters:
+      no-source: true
+    parameters:
+      content:
+        instance:
+          existing_destinations_policy: update
+          destinations:
+            - Name: complaint-management-html5-repository
+              ServiceInstanceName: complaint-management-html5-repo-host
+              ServiceKeyName: complaint-management-html5-repo-host-key
+              sap.cloud.service: complaint.management
+            - Name: complaint-management-auth
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: complaint-management-auth
+              ServiceKeyName: complaint-management-auth-key
+              sap.cloud.service: complaint.management
+
+resources:
+  - name: complaint-management-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: complaint-management-${org}-${space}
+        tenant-mode: dedicated
+        oauth2-configuration:
+          credential-types:
+            - "binding-secret"
+            - "x509"
+        role-collections:
+          - name: 'SupportAgent (complaint-management ${org}-${space})'
+            description: 'generated'
+            role-template-references:
+              - '$XSAPPNAME.SupportAgent'
+          - name: 'ComplaintManager (complaint-management ${org}-${space})'
+            description: 'generated'
+            role-template-references:
+              - '$XSAPPNAME.ComplaintManager'
+  - name: complaint-management-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: complaint-management-destination
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: srv-api
+    parameters:
+      service: destination
+      service-plan: lite
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            existing_destinations_policy: update
+            destinations:
+              - Name: srv-api
+                URL: ~{srv-api/srv-url}
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+                HTML5.ForwardAuthToken: true
+                HTML5.DynamicDestination: true
+
+  - name: complaint-management-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host

@@ -1,0 +1,228 @@
+{
+	"_version": "1.86.0",
+	"sap.app": {
+		"id": "com.mycompany.complaints.complaints",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				"",
+				"en"
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.2"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.28.0",
+			"toolsId": "9917c5c4-eaf4-411b-bd77-6d5dd04790d0"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "complaint/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "4.0"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"Complaint-manage": {
+					"semanticObject": "Complaint",
+					"action": "manage",
+					"title": "{{Complaint-manage.flpTitle}}",
+					"subTitle": "{{Complaint-manage.flpSubtitle}}",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "complaint.management"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.150.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "com.mycompany.complaints.complaints.i18n.i18n",
+					"supportedLocales": [
+						"",
+						"en"
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties",
+				"settings": {
+					"supportedLocales": [
+						"",
+						"en"
+					]
+				}
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "ComplaintsList",
+					"target": "ComplaintsList"
+				},
+				{
+					"pattern": "Complaints({key}):?query:",
+					"name": "ComplaintsObjectPage",
+					"target": "ComplaintsObjectPage"
+				},
+				{
+					"pattern": "Complaints({key})/comments({key2}):?query:",
+					"name": "ComplaintCommentsObjectPage",
+					"target": "ComplaintCommentsObjectPage"
+				}
+			],
+			"targets": {
+				"ComplaintsList": {
+					"type": "Component",
+					"id": "ComplaintsList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/Complaints",
+							"variantManagement": "Page",
+							"navigation": {
+								"Complaints": {
+									"detail": {
+										"route": "ComplaintsObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "ResponsiveTable",
+										"condensedTableLayout": false,
+										"popinLayout": "GridLarge"
+									},
+									"columns": {
+										"DataField::product::name": {
+											"widthIncludingColumnHeader": true
+										},
+										"DataField::customer::firstName": {
+											"widthIncludingColumnHeader": true
+										},
+										"DataField::subject": {
+											"widthIncludingColumnHeader": true
+										},
+										"DataField::status::name": {
+											"widthIncludingColumnHeader": true
+										},
+										"DataField::priority": {
+											"widthIncludingColumnHeader": true
+										},
+										"DataField::reportedAt": {
+											"widthIncludingColumnHeader": true
+										}
+									}
+								}
+							},
+							"defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
+							"initialLoad": "Enabled"
+						}
+					}
+				},
+				"ComplaintsObjectPage": {
+					"type": "Component",
+					"id": "ComplaintsObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/Complaints",
+							"navigation": {
+								"comments": {
+									"detail": {
+										"route": "ComplaintCommentsObjectPage"
+									}
+								}
+							}
+						}
+					}
+				},
+				"ComplaintCommentsObjectPage": {
+					"type": "Component",
+					"id": "ComplaintCommentsObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/Complaints/comments"
+						}
+					}
+				}
+			}
+		},
+		"flexBundle": false
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.fe": {
+		"app": {
+			"enableLazyLoading": true
+		}
+	}
+}

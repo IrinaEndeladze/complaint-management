@@ -1,0 +1,16 @@
+{
+  "name": "approuter",
+  "dependencies": {
+    "@sap/approuter": "^21.0.0"
+  },
+  "scripts": {
+    "start": "node node_modules/@sap/approuter/approuter.js",
+    "build": "ui5 build preload --clean-dest"
+  },
+  "version": "1.0.0",
+  "main": "webapp/index.html",
+  "devDependencies": {
+    "@ui5/cli": "^4",
+    "ui5-task-zipper": "^3"
+  }
+}
